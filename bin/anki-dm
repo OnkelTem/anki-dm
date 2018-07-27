@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 use AnkiDeckManager\Builder;
@@ -6,7 +7,14 @@ use AnkiDeckManager\Indexer;
 use AnkiDeckManager\Util;
 use AnkiDeckManager\Importer;
 
-require __DIR__ . '/vendor/autoload.php';
+if(file_exists($file = dirname(__DIR__) . "/vendor/autoload.php")) {
+  // Script is in ~/dir (f.e. ~/bin)
+  require $file;
+}
+else {
+  // Script is in ~/vendor/dir
+  require dirname(__DIR__) . "/autoload.php";
+}
 
 define('TEMPLATES_DIR', __DIR__ . '/templates');
 

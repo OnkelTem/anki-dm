@@ -5,7 +5,7 @@
   "type": "project",
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "bin": ["anki-dm"],
+  "bin": ["bin/anki-dm"],
   "version": "0.1",
   "require": {
     "docopt/docopt": "*",
