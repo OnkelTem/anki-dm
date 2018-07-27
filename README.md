@@ -8,14 +8,13 @@ to install JSON decks.
 
 ## How it worked before (CrowdAnki only)
 
-CrowAnki add-on adds one more exporting/importing option into Anki. 
-It can exports/imports to/from a JSON file and a directory with media.
-So you get all your data and configuration in a human-editable JSON format. 
+**CrowAnki** add-on defines a JSON format for storing decks data 
+and can export/import into it.  
 
 But it's actually not that convenient to edit big JSON files manually and there are no 
-tools which would considerably simplify the process. CrowdAnki didn't change the
-way how you managed decks before, editing workflow remained the same: you do everything
-inside Anki.
+tools which would considerably simplify the process. In other words, CrowdAnki doesn't 
+change the way how you manage decks, the editing workflow remains the same: you edit
+your deck inside Anki application.
 
 ## How it works now (CrowdAnki + Anki DM)
 
@@ -46,11 +45,11 @@ src/
 ```
 
 These files are then used to create CrowdAnki decks during the build process (see below). 
-They are divided into two parts or levels: global and deck-specific level.
+They are divided into two levels: global and deck-specific.
 
 ### Global level files
 
-Comprises files which are shared between decks (or deck variants):
+It contains files which are shared between decks (or deck variants):
 
 - `fields/*.json` - deck fields in JSON format;
 - `templates/*.html` - deck templates in HTML format;
@@ -62,7 +61,7 @@ Comprises files which are shared between decks (or deck variants):
 - `deck.json` - some deck properties;
 - `data.csv` - main data file, containing cards information in CSV format.
 
-This files are considered to be common for all decks, but some of then 
+These files are considered to be common for all the decks, but some of them 
 can be overridden at the deck-specific level.
 
 ### Deck level files
@@ -72,8 +71,8 @@ the `decks/` directory. Each can have its own list of fields and templates
 as well as description, options and styles.
 
 - `decks/<DeckName>/build.json` - main deck configuration file. It's the file
-where you define the list and the order of fields and templates, set the name
-of the deck and the model, and declare UUIDs for the deck, model and config. 
+where you define the list and the order of the fields and templates, set the name
+of the deck and the model, and assign UUIDs for the deck, model and config. 
 
 ```json
 {
