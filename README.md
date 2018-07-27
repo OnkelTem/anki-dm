@@ -2,9 +2,9 @@
 
 **Anki Deck Manager** (`anki-dsm`) is a tool for creating and maintaining 
 multilingual multi-variant Anki decks. It reads files organized in 
-a specific way and generates CrowdAnki JSON decks. In other words it doesn't create  
-installable `*.apkg` deck files for Anki and you need to use [CrowdAnki add-on](https://github.com/Stvad/CrowdAnki)
-into Anki for importing JSON deck into Anki.
+a specific way and generates CrowdAnki JSON decks. I.e. it doesn't create   
+some installable `*.apkg` files for Anki, you should use [CrowdAnki add-on](https://github.com/Stvad/CrowdAnki)
+to install JSON decks.
 
 ## How it worked before (CrowdAnki only)
 
