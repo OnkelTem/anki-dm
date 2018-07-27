@@ -106,12 +106,11 @@ and template definitions cannot be redefined at the deck level. This is by desig
 The data file - `data.csv` - is just a regular CSV file with the header. 
 Each field from the `fields/*.json` list must be represented here as a column.  
 
-In addition there are two special columns: `guid` and `tags`.
-
+In addition there are two special columns: `guid` and `tags`:
 ```
-guid,Name,Flag,tags
-e+/O]%*qfk,England,"<img src=""England.png"" />",Europe
-h~5xz+=ke~,Scotland,"<img src=""Scotland.png"" />",Europe
+guid,       Name,     Flag,                           tags
+e+/O]%*qfk, England,  "<img src=""England.png"" />",  Europe
+h~5xz+=ke~, Scotland, "<img src=""Scotland.png"" />", Europe
 ```
 
 The `tags` column contains whitespace-separated lists of tags.
@@ -171,7 +170,8 @@ Then create the `composer.json` file with the following minimal content:
 }
 ```
 
-Now if you run `composer install` it should download and install everything. 
+Now if you run `composer install` it should download and install everything.
+The `anki-dm` executable will be installed under `./vendor/bin/` directory.
 
 ## Usage
 
@@ -179,46 +179,46 @@ You can get the full list of options and commands via `anki-dm --help`.
 
 Usually you do something like this:
 
-1) Export a deck from Anki using the CrowdAnki export option.
-1) Import the deck:
+- Export a deck from Anki using the CrowdAnki export option.
+- Get the deck disassembled into Anki DM framework:
     ```
     $ anki-dm import path/to/deck/directory
     ```
-1) Edit the deck.
-1) If you added some new rows into `data.csv`, update the guid index:
+- Edit files according to your needs.
+- If you've added some new rows into `data.csv`, update the `guid` index:
     ```
     $ anki-dm index
     ```
-1) Finally build CrowdAnki deck(s): 
+- Finally build the deck(s): 
     ```
     $ anki-dm build
     ```
-   The decks will be save in the `build/` directory.    
+   The decks will be saved in the `build/` directory. They're now
+   ready to be imported inside Anki.    
 
-Instead of importing an existing deck you can start from scratch
-using `init` command which imports from one of predefine templates, e.g.:
+Instead of starting with an existing deck you can use `init` command 
+which imports an empty deck from one of predefined templates, e.g.:
 
 ```
-$ anki-dm init Default MyDeckName
+$ anki-dm init Default
 ```
 
 Making a copy of a deck can be done it two ways. The first one is obvious:
 just copy the deck's directory with a new name:
 
 ```
-$ cp -r decks/ExistingDeck  decks/NewDeck
+$ cp -r decks/ExistingDeck decks/NewDeck
 ```
   
-But doing it you're also copying UUIDs of the deck, model
+But doing so you're also copying UUIDs of the deck, model
 and config (they are stored in the `build.json` file). If you then build
 two decks with different models (i.e. different lists of fields) but with the 
-same Model UUID it can drive Anki mad and not without a reason. 
+same Model UUID it can drive Anki mad and not without a reason, eh? 
 
-Instead please use the `copy` command instead: 
+Instead please use the `copy` command: 
 
 ```
-$ anki-dm copy ExistingDeck  NewDeck
+$ anki-dm copy ExistingDeck NewDeck
 ```
 
 It will not only copy files recursively, but will also generate appropriate UUIDs.  
-
