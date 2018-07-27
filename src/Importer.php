@@ -98,9 +98,7 @@ class Importer {
     $templates = $model['tmpls'];
     Util::prepareDir("$dir/templates");
     foreach($templates as $template) {
-      // Unset ordinal numbers
-      unset($template['ord']);
-      file_put_contents("$dir/templates/$template[name].json", Util::toJson($template));
+      file_put_contents("$dir/templates/$template[name].html", $template['qfmt'] . "\n\n--\n\n" . $template['afmt']);
     }
     // Keep templates list for later
     $template_list = array_map(function ($value) {

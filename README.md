@@ -35,7 +35,7 @@ src/
     Card-1.png
     Card-2.png
   templates/
-    Card 1.html
+    Card 1.json
   config.json
   data.csv
   deck.json
@@ -51,14 +51,16 @@ They are divided into two levels: global and deck-specific.
 
 It contains files which are shared between decks (or deck variants):
 
-- `fields/*.json` - deck fields in JSON format;
-- `templates/*.html` - deck templates in HTML format;
-- `media/*` - media files - images or audio; 
-- `desc.html` - deck description in HTML format;
-- `style.css` - deck stylesheet in CSS format;
-- `config.json` - deck configuration options;
-- `model.json` - model deck properties like type of the deck (Cloze or not), LeTex document prefix and suffix;
-- `deck.json` - some deck properties;
+- `fields/*.json` - deck fields in JSON format.
+- `templates/*.html` - deck templates in HTML format.
+  Each file contains both question and
+  and answer templates divided by `--` on a separate line.
+- `media/*` - media files - images or audio.
+- `desc.html` - deck description in HTML format.
+- `style.css` - deck stylesheet in CSS format.
+- `config.json` - deck configuration options.
+- `model.json` - model deck properties like type of the deck (Cloze or not), LeTex document prefix and suffix.
+- `deck.json` - some deck properties.
 - `data.csv` - main data file, containing cards information in CSV format.
 
 These files are considered to be common for all the decks, but some of them 

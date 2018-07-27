@@ -51,7 +51,6 @@ class Util {
   }
 
   public static function getJsons($dir) {
-    // Read templates
     $data = [];
     if ($dh = opendir($dir)) {
       while (($file = readdir($dh)) !== false) {
@@ -60,6 +59,35 @@ class Util {
         }
         if (filetype($dir . '/' . $file) == 'file') {
           $data[] = static::getJson($dir . '/' . $file);
+        }
+      }
+    }
+    return $data;
+  }
+
+  public static function getTemplates($dir) {
+    $data = [];
+    if ($dh = opendir($dir)) {
+      while (($file = readdir($dh)) !== false) {
+        if ($file == '.' || $file == '..') {
+          continue;
+        }
+        if (filetype($dir . '/' . $file) == 'file') {
+          if (preg_match('~(.*)\.html$~', $file, $matches)) {
+            $template = $matches[1];
+            $html = static::getRaw($dir . '/' . $file);
+            if (($parts = preg_split('~\r?\n\r?\n--\r?\n\r?\n~', $html)) === FALSE) {
+              static::err("Incorrect template: $file. It must consist of two parts divided by '--' on a separate line.");
+            }
+            $data[$template] = [
+              'qfmt' => $parts[0],
+              'afmt' => $parts[1],
+              'name' => $template,
+              'bafmt' => '',
+              'bqfmt' => '',
+              'did' => NULL,
+            ];
+          }
         }
       }
     }

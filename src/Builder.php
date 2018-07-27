@@ -11,7 +11,7 @@ class Builder {
       'model' => Util::getJson($src_dir . '/model.json'),
       'fields' => Util::getJsons($src_dir . '/fields'),
       'media' => Util::getFilesList($src_dir . '/media'),
-      'templates' => Util::getJsons($src_dir . '/templates'),
+      'templates' => Util::getTemplates($src_dir . '/templates'),
       'desc' => Util::getRaw($src_dir . '/desc.html'),
       'css' => Util::getRaw($src_dir . '/style.css'),
       'data' => Util::getCsv($src_dir . '/data.csv'),
@@ -56,11 +56,10 @@ class Builder {
         $deck_templates_info = [];
         $k = 0;
         foreach ($deck_build['templates'] as $template) {
-          foreach($globals['templates'] as $template_info) {
-            if ($template_info['name'] == $template) {
-              $deck_templates_info[] = $template_info + ['ord' => $k++];
-            }
+          if (!isset($globals['templates'][$template])) {
+            Util::err("Field template '$template' doesn't exist");
           }
+          $deck_templates_info[] = $globals['templates'][$template] + ['ord' => $k++];
         }
 
         // Populate fields
@@ -101,6 +100,9 @@ class Builder {
         $deck_fields_data = [];
         $deck_media = [];
         foreach ($deck_build['fields'] as $field) {
+          if (!isset($globals['data'][$lang][$field])) {
+            Util::err("Column \"$field\" is missed in \"data.csv\".");
+          }
           foreach ($globals['data'][$lang][$field] as $i => $cell) {
             $deck_fields_data[$i]['fields'][] = $cell;
             // Scan for media
