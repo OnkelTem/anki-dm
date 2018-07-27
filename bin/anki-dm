@@ -16,7 +16,7 @@ else {
   require dirname(__DIR__) . "/../../autoload.php";
 }
 
-define('TEMPLATES_DIR', __DIR__ . '/templates');
+define('TEMPLATES_DIR', __DIR__ . '/../templates');
 
 $args = Docopt::handle(get_doc());
 
