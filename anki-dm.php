@@ -1,0 +1,121 @@
+<?php
+
+use AnkiDeckManager\Builder;
+use AnkiDeckManager\Copier;
+use AnkiDeckManager\Indexer;
+use AnkiDeckManager\Util;
+use AnkiDeckManager\Importer;
+
+require __DIR__ . '/vendor/autoload.php';
+
+define('TEMPLATES_DIR', __DIR__ . '/templates');
+
+$args = Docopt::handle(get_doc());
+
+$base = $args['--base'];
+
+$templates = Util::getFilesList(TEMPLATES_DIR, 'dir');
+if ($args['--templates']) {
+  if (count($templates)) {
+    Util::msg(implode("\n", $templates));
+    exit(0);
+  }
+  else {
+    Util::msg("No templates found");
+    exit(1);
+  }
+}
+
+if ($args['init']) {
+  $template = $args['TEMPLATE'];
+  if (!in_array($template, $templates)) {
+    Util::err('Cannot find template: ' . $template);
+  }
+  $deck = $args['--deck'];
+  Util::prepareDir($base);
+  if (!Util::isDirEmpty($base)) {
+    Util::err('Directory "' . $base . '" is not empty');
+  }
+  Importer::import(TEMPLATES_DIR . '/' . $template, $base, $deck);
+}
+else if ($args['import']) {
+  $path = $args['PATH'];
+  $deck = $args['--deck'];
+  Util::prepareDir($base);
+  if (!Util::isDirEmpty($base)) {
+    Util::err('Directory "' . $base . '" is not empty');
+  }
+  Importer::import($path, $base, $deck);
+}
+else if ($args['build']) {
+  $decks = $args['DECK'];
+  $dst = $args['--build'];
+  $lang = $args['--lang'];
+  Builder::build($decks, $base, $dst, $lang);
+}
+else if ($args['index']) {
+  $full = $args['--full'];
+  Indexer::index($full, $base);
+}
+else if ($args['copy']) {
+  $deck1 = $args['DECK1'];
+  $deck2 = $args['DECK2'];
+  Copier::copy($deck1, $deck2, $base);
+}
+else if ($args['info']) {
+  $deck1 = $args['DECK1'];
+  $deck2 = $args['DECK2'];
+  Copier::copy($deck1, $deck2, $base);
+}
+
+/* Helper routines */
+
+function get_doc() {
+  return <<<DOC
+Usage:
+  anki-dm ( init TEMPLATE [--deck=NAME] |
+            import PATH [--deck=NAME] |
+            build [DECK ...] [--lang=CODE] [--build=PATH] |
+            copy DECK1 [DECK2] |
+            index [--full] )
+          [--base=PATH]
+  anki-dm --templates
+  anki-dm --help
+           
+Anki Decks Manager (anki-dm)
+
+This tool disassembles CrowdAnki decks into collections of files
+and directories which are easy to maintain. It then allows you to can
+create variants of your deck via combining fields, templates and data 
+that you really need. You can also use this tool to create translations
+of your deck by creating localized columns in data files.
+
+Commands:
+  init                Creates a new deck set using one of predefined templates.
+  import              Creates a new deck set from a CrowdAnki deck.
+  build               Builds CrowdAnki decks from a deck set.
+  copy                Creates a copy of an existing deck in a deck set.
+  index               Indexes rows with empty GUID-index value. 
+           
+Options:
+  --deck=NAME         Name of the default deck of the deck set being created.
+                      If not provided, then the original deck/template name will be used.
+  --base=PATH         Path to the deck set directory.
+                      [Default: src]
+  --lang=CODE         Build decks for the specific language code.  
+                      If omitted then decks for all languages will be built.
+  --build=PATH        Path to the build directory.
+                      [Default: build]
+  --full              Reindex all data rows.  
+  --templates         List all available templates.
+  --help              Show this screen.
+
+Arguments:
+  init TEMPLATE       Template to use when creating the deck set.
+  import PATH         Path to a CrowdAnki deck directory to import.
+  build [DECK ... ]   Decks to build. If not specified then all decks of the deck set will be built.
+  copy DECK1 [DECK2]  Names of the decks to copy from and into. If target deck is not provided
+                      it's calculated automatically by suffixing.
+
+DOC;
+}

@@ -1,0 +1,19 @@
+{
+  "name": "onkeltem/anki-dm",
+  "description": "Anki Deck Manager",
+  "license": "MIT",
+  "type": "project",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "bin": ["anki-dm"],
+  "version": "0.1",
+  "require": {
+    "docopt/docopt": "*",
+    "ramsey/uuid": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "AnkiDeckManager\\": "src/"
+    }
+  }
+}
