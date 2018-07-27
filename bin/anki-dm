@@ -13,7 +13,7 @@ if(file_exists($file = dirname(__DIR__) . "/vendor/autoload.php")) {
 }
 else {
   // Script is in ~/vendor/dir
-  require dirname(__DIR__) . "/autoload.php";
+  require dirname(__DIR__) . "/../../autoload.php";
 }
 
 define('TEMPLATES_DIR', __DIR__ . '/templates');
