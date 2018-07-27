@@ -175,7 +175,7 @@ class Builder {
       // Build only specified decks
       foreach($decks as $deck) {
         if (file_exists($dir . '/' . $deck) && filetype($dir . '/' . $deck) == 'dir') {
-          $decks_data[$deck] = read_deck($dir . '/' . $deck);
+          $decks_data[$deck] = static::readDeck($dir . '/' . $deck);
         }
         else {
           Util::err('Deck not found: ' . $dir . '/' . $deck);

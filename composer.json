@@ -3,7 +3,6 @@
   "description": "Anki Deck Manager",
   "license": "MIT",
   "type": "project",
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "bin": ["bin/anki-dm"],
   "version": "0.1",
