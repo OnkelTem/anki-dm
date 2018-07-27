@@ -160,11 +160,11 @@ Then create the `composer.json` file with the following minimal content:
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/onkeltem/anki-dm"
+      "url": "https://github.com/OnkelTem/anki-dm"
     }
   ],
   "require": {
-    "onkeltem/anki-dm": "*"
+    "OnkelTem/anki-dm": "*"
   }
 }
 ```
