@@ -164,7 +164,7 @@ Then create the `composer.json` file with the following minimal content:
     }
   ],
   "require": {
-    "OnkelTem/anki-dm": "*"
+    "onkeltem/anki-dm": "*"
   }
 }
 ```
