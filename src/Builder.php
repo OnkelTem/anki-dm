@@ -9,7 +9,7 @@ class Builder {
       'deck' => Util::getJson($src_dir . '/deck.json'),
       'config' => Util::getJson($src_dir . '/config.json'),
       'model' => Util::getJson($src_dir . '/model.json'),
-      'fields' => Util::getJsons($src_dir . '/fields'),
+      'fields' => Util::getFields($src_dir . '/fields'),
       'media' => Util::getFilesList($src_dir . '/media'),
       'templates' => Util::getTemplates($src_dir . '/templates'),
       'desc' => Util::getRaw($src_dir . '/desc.html'),
@@ -57,20 +57,19 @@ class Builder {
         $k = 0;
         foreach ($deck_build['templates'] as $template) {
           if (!isset($globals['templates'][$template])) {
-            Util::err("Field template '$template' doesn't exist");
+            Util::err("Field template '$template' not found.");
           }
-          $deck_templates_info[] = $globals['templates'][$template] + ['ord' => $k++];
+          $deck_templates_info[] = ['name'  => $template, 'ord' => $k++] + $globals['templates'][$template];
         }
 
         // Populate fields
         $deck_fields_info = [];
         $i = 0;
         foreach ($deck_build['fields'] as $field) {
-          foreach($globals['fields'] as $field_info) {
-            if ($field_info['name'] == $field) {
-              $deck_fields_info[] = $field_info + ['ord' => $i++];
-            }
+          if (!isset($globals['fields'][$field])) {
+            Util::err("Field '$field' not found.");
           }
+          $deck_fields_info[] = ['name'  => $field, 'ord' => $i++] + $globals['fields'][$field];
         }
 
         // Populate model
@@ -101,7 +100,7 @@ class Builder {
         $deck_media = [];
         foreach ($deck_build['fields'] as $field) {
           if (!isset($globals['data'][$lang][$field])) {
-            Util::err("Column \"$field\" is missed in \"data.csv\".");
+            Util::err("Column '$field' is missed in 'data.csv'.");
           }
           foreach ($globals['data'][$lang][$field] as $i => $cell) {
             $deck_fields_data[$i]['fields'][] = $cell;
@@ -118,7 +117,7 @@ class Builder {
           if (empty($cell)) {
             Util::err('Missing value in the "guid" field in the row: ' . "\n" . Util::toJson($deck_fields_data[$i]['fields']) . "\n" . 'Run "index" command to fix the problem.');
           }
-          $deck_fields_data[$i]['guid'] = $cell;
+          $deck_fields_data[$i]['guid'] = Util::guidDecode($cell, $deck_build['uuids']['model']);
         }
 
         if (!isset($globals['data'][$lang]['tags'])) {

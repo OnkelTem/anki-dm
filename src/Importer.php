@@ -14,7 +14,7 @@ class Importer {
       $dir = 'src';
     }
 
-    $deck_data = json_decode(file_get_contents($file), TRUE);
+    $deck_data = Util::getJson($file);
 
     // Check if we support such deck
     if (count($deck_data['deck_configurations']) > 1 || count($deck_data['note_models']) > 1) {
@@ -54,10 +54,11 @@ class Importer {
     // Save fields
     Util::prepareDir("$dir/fields");
     foreach($model['flds'] as $field) {
-      Util::checkFieldName($field['name']);
+      $field_name = Util::checkFieldName($field['name']);
       // Unset ordinal numbers
       unset($field['ord']);
-      file_put_contents("$dir/fields/$field[name].json", Util::toJson($field));
+      unset($field['name']);
+      file_put_contents("$dir/fields/$field_name.json", Util::toJson($field));
     }
     $field_list = array_map(function ($value) {
       return $value['name'];
@@ -78,7 +79,7 @@ class Importer {
     fputcsv($fp, $header);
     foreach($notes as $note) {
       $row = [];
-      $row[] = $note['guid'];
+      $row[] = Util::guidEncode($note['guid'], $uuids['model']);
       foreach($field_list as $i => $field) {
         $row[] = $note['fields'][$i];
       }

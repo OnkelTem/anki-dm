@@ -1,26 +1,26 @@
 # Anki Deck Manager
 
-**Anki Deck Manager** (`anki-dsm`) is a tool for creating and maintaining 
-multilingual multi-variant Anki decks. It reads files organized in 
-a specific way and generates CrowdAnki JSON decks. I.e. it doesn't create   
+**Anki Deck Manager** (`anki-dsm`) is a tool for creating and maintaining
+multilingual multi-variant Anki decks. It reads files organized in
+a specific way and generates CrowdAnki JSON decks. I.e. it doesn't create
 some installable `*.apkg` files for Anki, you should use [CrowdAnki add-on](https://github.com/Stvad/CrowdAnki)
 to install JSON decks.
 
 ## How it worked before (CrowdAnki only)
 
-**CrowAnki** add-on defines a JSON format for storing decks data 
-and can export/import into it.  
+**CrowAnki** add-on defines a JSON format for storing decks data
+and can export/import into it.
 
-But it's actually not that convenient to edit big JSON files manually and there are no 
-tools which would considerably simplify the process. In other words, CrowdAnki doesn't 
+But it's actually not that convenient to edit big JSON files manually and there are no
+tools which would considerably simplify the process. In other words, CrowdAnki doesn't
 change the way how you manage decks, the editing workflow remains the same: you edit
 your deck inside Anki application.
 
 ## How it works now (CrowdAnki + Anki DM)
 
-**Anki Deck Manager** disassembles CrowdAnki deck into a collection of files 
-and directories which are really easy to maintain. Specifically, given a CrowdAnki 
-deck at its input it generates a file structure like this:  
+**Anki Deck Manager** disassembles CrowdAnki deck into a collection of files
+and directories which are really easy to maintain. Specifically, given a CrowdAnki
+deck at its input it generates a file structure like this:
 
 ```
 src/
@@ -35,7 +35,7 @@ src/
     Card-1.png
     Card-2.png
   templates/
-    Card 1.json
+    Card 1.html
   config.json
   data.csv
   deck.json
@@ -44,7 +44,7 @@ src/
   style.css
 ```
 
-These files are then used to create CrowdAnki decks during the build process (see below). 
+These files are then used to create CrowdAnki decks during the build process (see below).
 They are divided into two levels: global and deck-specific.
 
 ### Global level files
@@ -52,9 +52,19 @@ They are divided into two levels: global and deck-specific.
 It contains files which are shared between decks (or deck variants):
 
 - `fields/*.json` - deck fields in JSON format.
+  Field names are taken from the file names.
 - `templates/*.html` - deck templates in HTML format.
-  Each file contains both question and
-  and answer templates divided by `--` on a separate line.
+  Template names are taken from the file names.
+  Each file contains both question and and answer
+  templates divided by `\n\n--\n\n`, e.g.:
+  ```
+  {{Color}}
+
+  --
+
+  {{FrontSide}}
+  {{Value}}
+  ```
 - `media/*` - media files - images or audio.
 - `desc.html` - deck description in HTML format.
 - `style.css` - deck stylesheet in CSS format.
@@ -63,18 +73,18 @@ It contains files which are shared between decks (or deck variants):
 - `deck.json` - some deck properties.
 - `data.csv` - main data file, containing cards information in CSV format.
 
-These files are considered to be common for all the decks, but some of them 
+These files are considered to be common for all the decks, but some of them
 can be overridden at the deck-specific level.
 
 ### Deck level files
 
 You can create unlimited amount of deck variants. They are stored inside
-the `decks/` directory. Each can have its own list of fields and templates 
+the `decks/` directory. Each can have its own list of fields and templates
 as well as description, options and styles.
 
 - `decks/<DeckName>/build.json` - main deck configuration file. It's the file
 where you define the list and the order of the fields and templates, set the name
-of the deck and the model, and assign UUIDs for the deck, model and config. 
+of the deck and the model, and assign UUIDs for the deck, model and config.
 
 ```json
 {
@@ -96,16 +106,16 @@ of the deck and the model, and assign UUIDs for the deck, model and config.
 
 ```
 
-The files: `desc.html`, `style.css`, `config.json`, `model.json` and `deck.json` - 
+The files: `desc.html`, `style.css`, `config.json`, `model.json` and `deck.json` -
 serve the same purpose as their parents at the global level but override them.
 
-You cannot override however `data.csv` file. That one, along with field 
+You cannot override however `data.csv` file. That one, along with field
 and template definitions cannot be redefined at the deck level. This is by design.
 
 ### Data file structure
 
-The data file - `data.csv` - is just a regular CSV file with the header. 
-Each field from the `fields/*.json` list must be represented here as a column.  
+The data file - `data.csv` - is just a regular CSV file with the header.
+Each field from the `fields/*.json` list must be represented here as a column.
 
 In addition there are two special columns: `guid` and `tags`:
 ```
@@ -116,16 +126,16 @@ h~5xz+=ke~, Scotland, "<img src=""Scotland.png"" />", Europe
 
 The `tags` column contains whitespace-separated lists of tags.
 
-The `guid` column is an identifier for a row. For the same data 
-it should always be the same or deck update for this row won't work. 
+The `guid` column is an identifier for a row. For the same data
+it should always be the same or deck update for this row won't work.
 When you add new rows just leave the `guid` cells empty and run
 `anki-dm index` once you're done.
 
 ### Data translation
 
-To localize a deck simply add new columns with translation. 
+To localize a deck simply add new columns with translation.
 **Anki DM** will parse the column names trying to extract language code
-which is specified via suffix: `<FieldName>:fr`.   
+which is specified via suffix: `<FieldName>:fr`.
 
 Consider the example (spaces are added for readability):
 
@@ -147,6 +157,28 @@ qSYi3}_Rdg, Red,   Rouge,   #ff0000, ""
 q`KoKFfXAS, Green, Vert,    #00ff00, ""
 qSYi3}_Rdg, Blue,  Bleu,    #0000ff, ""
 ```
+
+## Important GUID notes
+
+When you import a deck with existing data, GUID values are
+encoded using the model's UUID:
+
+```
+new_guid = original_guid - model_uuid
+```
+
+Apparently when we build a deck that we've just imported
+we can now restore the original GUIDs by a reverse
+procedure - decoding:
+
+```
+original_guid = new_guid + model_uuid
+```
+
+Basically this allows us to continue studying our favorite deck
+when we migrate it from `*.apkg` to Anki DM. But if you create
+a new deck variant **with new model UUID** then all GUIDs be
+also new and won't lead to a conflict inside Anki.
 
 ## Installation
 
@@ -190,14 +222,14 @@ Usually you do something like this:
     ```
     $ anki-dm index
     ```
-- Finally build the deck(s): 
+- Finally build the deck(s):
     ```
     $ anki-dm build
     ```
    The decks will be saved in the `build/` directory. They're now
-   ready to be imported inside Anki.    
+   ready to be imported inside Anki.
 
-Instead of starting with an existing deck you can use `init` command 
+Instead of starting with an existing deck you can use `init` command
 which imports an empty deck from one of predefined templates, e.g.:
 
 ```
@@ -210,16 +242,16 @@ just copy the deck's directory with a new name:
 ```
 $ cp -r decks/ExistingDeck decks/NewDeck
 ```
-  
+
 But doing so you're also copying UUIDs of the deck, model
 and config (they are stored in the `build.json` file). If you then build
-two decks with different models (i.e. different lists of fields) but with the 
-same Model UUID it can drive Anki mad and not without a reason, eh? 
+two decks with different models (i.e. different lists of fields) but with the
+same Model UUID it can drive Anki mad and not without a reason, eh?
 
-Instead please use the `copy` command: 
+Instead please use the `copy` command:
 
 ```
 $ anki-dm copy ExistingDeck NewDeck
 ```
 
-It will not only copy files recursively, but will also generate appropriate UUIDs.  
+It will not only copy files recursively, but will also generate appropriate UUIDs.

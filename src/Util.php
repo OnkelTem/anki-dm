@@ -65,6 +65,24 @@ class Util {
     return $data;
   }
 
+  public static function getFields($dir) {
+    $data = [];
+    if ($dh = opendir($dir)) {
+      while (($file = readdir($dh)) !== false) {
+        if ($file == '.' || $file == '..') {
+          continue;
+        }
+        if (filetype($dir . '/' . $file) == 'file') {
+          if (preg_match('~(.*)\.json$~', $file, $matches)) {
+            $field = $matches[1];
+            $data[$field] = static::getJson($dir . '/' . $file);
+          }
+        }
+      }
+    }
+    return $data;
+  }
+
   public static function getTemplates($dir) {
     $data = [];
     if ($dh = opendir($dir)) {
@@ -171,8 +189,13 @@ class Util {
     return $result;
   }
 
-  public static function anki_py_base62($num, $extra = "") {
-    $table = 'abcdefghijklmnopqrstuvwxyz' . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' . '0123456789' . $extra;
+  protected static function getGuidChars() {
+    return 'abcdefghijklmnopqrstuvwxyz' . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' . '0123456789' . "!#$%&()*+,-./:;<=>?@[]^_`{|}~";
+  }
+
+  public static function createGuid() {
+    $table = static::getGuidChars();
+    $num = rand(0, PHP_INT_MAX);
     $buf = "";
     while ($num) {
       $mod = $num % strlen($table);
@@ -182,15 +205,50 @@ class Util {
     return $buf;
   }
 
-  public static function anki_py_base91($num) {
-    $base91_extra_chars = "!#$%&()*+,-./:;<=>?@[]^_`{|}~";
-    # all printable characters minus quotes, backslash and separators
-    return static::anki_py_base62($num, $base91_extra_chars);
+  public static function guidEncode($guid, $uuid) {
+    return static::guidTransform($guid, $uuid, 'encode');
   }
 
-  public static function ankiPyGuid64() {
-    return static::anki_py_base91(rand(0, PHP_INT_MAX));
+  public static function guidDecode($guid, $uuid) {
+    return static::guidTransform($guid, $uuid, 'decode');
   }
+
+  protected static function guidTransform($guid, $uuid, $dir = 'encode') {
+    $table = static::getGuidChars();
+    $i = 0;
+    $j = 0;
+    $result = $guid;
+    while ($j < strlen($uuid)) {
+      if ($i == strlen($guid)) {
+        $i = 0;
+      }
+      $a = $guid[$i];
+      $b = $uuid[$j];
+      if (($an = strpos($table, $a)) === FALSE) {
+        Util::err("Cannot encode 'guid': guid char not found: $a. 'guid' = $guid, 'uuid' = $uuid");
+      }
+      if (($bn = strpos($table, $b)) === FALSE) {
+        Util::err("Cannot encode 'guid': guid char not found: $b. 'guid' = $guid, 'uuid' = $uuid");
+      }
+      if ($dir == 'encode') {
+        $cn = $an - $bn;
+      }
+      else {
+        $cn = $an + $bn;
+      }
+      if ($cn >= strlen($table)) {
+        $cn = $cn % strlen($table);
+      }
+      else if ($cn < 0) {
+        $cn = strlen($table) + $cn;
+      }
+      $result[$i] = $table[$cn];
+      $i++;
+      $j++;
+    }
+    return $result;
+  }
+
 
   public static function isDirEmpty($dir) {
     if (!is_readable($dir)) return NULL;
@@ -205,6 +263,7 @@ class Util {
     if (in_array($name, ['guid', 'tags'])) {
       Util::err('Fields with names "guid" and "tags" are reserved, please rename them first.');
     }
+    return $name;
   }
 
   /**
