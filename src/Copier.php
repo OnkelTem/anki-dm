@@ -33,18 +33,14 @@ class Copier {
 
     $deck_build = Util::getJson($deck2_path . '/build.json');
 
-    $deck_build['name'] = isset($deck2) ? $deck2 : $deck_build['name'] . $deck2_suffix;
-    $deck_uuid = Uuid::uuid1();
     // Create new uuids
-    $deck_build['uuids'] = [
-      'deck' => $deck_uuid,
-      'model' => Uuid::uuid1(),
-      'config' => $deck_uuid
-    ];
+    $deck_build['deck']['uuid'] = Uuid::uuid1();
+    $deck_build['config']['uuid'] = Uuid::uuid1();
+    $deck_build['model']['uuid'] = Uuid::uuid1();
 
     file_put_contents($deck2_path . '/build.json', Util::toJson($deck_build));
 
-    Util::msg("Created deck: $deck_build[name]");
+    Util::msg("Created deck: " . ($deck2 ? $deck2 : $deck1 . $deck2_suffix));
   }
 
 }

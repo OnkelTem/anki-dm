@@ -205,6 +205,33 @@ class Util {
     return $buf;
   }
 
+  public static function uuidEncode($uuid, $lang) {
+    if ($lang == 'default') {
+      return $uuid;
+    }
+    $table = '0123456789abcdef';
+    $lang_code = 0;
+    for ($i = 0; $i < strlen($lang); $i++) {
+      $lang_code += ord($lang[$i]);
+    }
+    $j = 0;
+    $result = $uuid;
+    while ($j < strlen($uuid)) {
+      if ($uuid[$j] == '-') {
+        $j++;
+        continue;
+      }
+      $a = $uuid[$j];
+      if (($an = strpos($table, $a)) === FALSE) {
+        Util::err("Cannot encode 'uuid': uuid char not found: $a. 'lang' = $lang, 'uuid' = $uuid");
+      }
+      $cn = ($an + $lang_code) % strlen($table);
+      $result[$j] = $table[$cn];
+      $j++;
+    }
+    return $result;
+  }
+
   public static function guidEncode($guid, $uuid) {
     return static::guidTransform($guid, $uuid, 'encode');
   }
@@ -257,6 +284,10 @@ class Util {
 
   public static function ensureDeckFilename($filename) {
     return str_replace('::', '__', $filename);
+  }
+
+  public static function ensureDeckName($filename) {
+    return str_replace('__', '::', $filename);
   }
 
   public static function checkFieldName($name) {

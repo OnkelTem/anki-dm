@@ -2,6 +2,8 @@
 
 namespace AnkiDeckManager;
 
+use Ramsey\Uuid\Uuid;
+
 class Importer {
 
   static function import($path, $dir, $deck = NULL) {
@@ -13,6 +15,8 @@ class Importer {
     if (!$dir) {
       $dir = 'src';
     }
+
+    $build_info = [];
 
     $deck_data = Util::getJson($file);
 
@@ -27,7 +31,8 @@ class Importer {
     }
 
     // Array of IDs
-    $uuids['deck'] = $deck_data['crowdanki_uuid'];
+    // We don't preserve $deck_data['crowdanki_uuid'] as AnkiDroid cannot deal with it
+    $build_info['deck']['uuid'] = Uuid::uuid1();
 
     // GLOBAL
 
@@ -37,8 +42,10 @@ class Importer {
 
     // Save configuration
     $configuration = $deck_data['deck_configurations'][0];
-    $uuids['config'] = $configuration['crowdanki_uuid'];
-    $configuration_info = array_intersect_key($configuration, array_flip(['autoplay', 'dyn', 'lapse', 'maxTaken', 'name', 'new', 'replayq', 'rev', 'timer']));
+    // We don't preserve $configuration['crowdanki_uuid'] as AnkiDroid cannot deal with it
+    $build_info['config']['uuid'] = Uuid::uuid1();
+    $build_info['config']['name'] = $configuration['name'];
+    $configuration_info = array_intersect_key($configuration, array_flip(['autoplay', 'dyn', 'lapse', 'maxTaken', 'new', 'replayq', 'rev', 'timer']));
     file_put_contents("$dir/config.json", Util::toJson($configuration_info));
 
     // Saving deck description
@@ -47,7 +54,9 @@ class Importer {
 
     // Save model
     $model = $deck_data['note_models'][0];
-    $uuids['model'] = $model['crowdanki_uuid'];
+    // We don't preserve $model['crowdanki_uuid'] as AnkiDroid cannot deal with it
+    $build_info['model']['uuid'] = Uuid::uuid1();
+    $build_info['model']['name'] = $model['name'];
     $model_info = array_intersect_key($model, array_flip(['latexPost', 'latexPre', 'type'])) + ['vers' => []];
     file_put_contents("$dir/model.json", Util::toJson($model_info));
 
@@ -79,7 +88,7 @@ class Importer {
     fputcsv($fp, $header);
     foreach($notes as $note) {
       $row = [];
-      $row[] = Util::guidEncode($note['guid'], $uuids['model']);
+      $row[] = Util::guidEncode($note['guid'], $build_info['model']['uuid']);
       foreach($field_list as $i => $field) {
         $row[] = $note['fields'][$i];
       }
@@ -123,14 +132,7 @@ class Importer {
     $deck_dir_name = Util::ensureDeckFilename($deck_name);
     Util::prepareDir("$dir/decks/$deck_dir_name");
 
-    $build_info = [
-      'name' => $deck_name,
-      'model_name' => $model['name'],
-      'uuids' => [
-        'deck' => $uuids['deck'],
-        'model' => $uuids['model'],
-        'config' => $uuids['config']
-      ],
+    $build_info += [
       'fields' => $field_list,
       'templates' => $template_list,
     ];

@@ -37,20 +37,26 @@ class Builder {
       foreach ($decks_build as $deck => $deck_build) {
          Util::msg("Building deck: $deck (Language: $lang)");
 
+         // Encode UUIDs with language
+        $deck_build['deck']['uuid'] = Util::uuidEncode($deck_build['deck']['uuid'], $lang);
+        $deck_build['config']['uuid'] = Util::uuidEncode($deck_build['config']['uuid'], $lang);
+        $deck_build['model']['uuid'] = Util::uuidEncode($deck_build['model']['uuid'], $lang);
+
         // Populate top-level properties
         $deck_data = [
           '__type__' => 'Deck',
-          'crowdanki_uuid' => $deck_build['uuids']['deck'],
-          'name' => $deck_build['name'],
+          'crowdanki_uuid' => $deck_build['deck']['uuid'],
+          'name' => Util::ensureDeckName($lang == 'default' ? $deck : $deck . '[' . $lang . ']'),
           'desc' => isset($deck_build['@desc']) ? $deck_build['@desc'] : $globals['desc'],
         ] + array_merge($globals['deck'], $deck_build['@deck']);
 
         // Populate config
         $deck_data['deck_configurations'][] = [
           '__type__' => 'DeckConfig',
-          'crowdanki_uuid' => $deck_build['uuids']['config'],
+          'crowdanki_uuid' => $deck_build['config']['uuid'],
+          'name' => $deck_build['config']['name']
         ] + array_merge($globals['config'], $deck_build['@config']);
-        $deck_data['deck_config_uuid'] = $deck_build['uuids']['config'];
+        $deck_data['deck_config_uuid'] = $deck_build['config']['uuid'];
 
         // Populate templates
         $deck_templates_info = [];
@@ -77,8 +83,8 @@ class Builder {
         // Whenever you export a deck 'req' is calculated by Anki.
         $deck_data['note_models'][] = [
             '__type__' => 'NoteModel',
-            'crowdanki_uuid' => $deck_build['uuids']['model'],
-            'name' => $deck_build['model_name'],
+            'crowdanki_uuid' => $deck_build['model']['uuid'],
+            'name' => $deck_build['model']['name'],
             'flds' => $deck_fields_info,
             'tmpls' => $deck_templates_info,
             'css' => isset($deck_build['@css']) ? $deck_build['@css'] : $globals['css'],
@@ -117,7 +123,7 @@ class Builder {
           if (empty($cell)) {
             Util::err('Missing value in the "guid" field in the row: ' . "\n" . Util::toJson($deck_fields_data[$i]['fields']) . "\n" . 'Run "index" command to fix the problem.');
           }
-          $deck_fields_data[$i]['guid'] = Util::guidDecode($cell, $deck_build['uuids']['model']);
+          $deck_fields_data[$i]['guid'] = Util::guidDecode($cell, $deck_build['model']['uuid']);
         }
 
         if (!isset($globals['data'][$lang]['tags'])) {
@@ -134,7 +140,7 @@ class Builder {
             'fields' => $row['fields'],
             'flags' => 0,
             'guid' => $row['guid'],
-            'note_model_uuid' => $deck_build['uuids']['model'],
+            'note_model_uuid' => $deck_build['model']['uuid'],
             'tags' => isset($row['tags']) ? $row['tags'] : [],
           ];
         }

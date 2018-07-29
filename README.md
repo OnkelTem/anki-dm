@@ -160,25 +160,33 @@ qSYi3}_Rdg, Blue,  Bleu,    #0000ff, ""
 
 ## Important GUID notes
 
-When you import a deck with existing data, GUID values are
-encoded using the model's UUID:
+Initial implementation allowed you to preserve
+original notes IDs. When you imported a deck with existing data, 
+GUID values were encoded using the model's UUID:
 
 ```
 new_guid = original_guid - model_uuid
 ```
 
-Apparently when we build a deck that we've just imported
-we can now restore the original GUIDs by a reverse
+Apparently when we built a deck that we'd imported,
+we could restore the original GUIDs by a reverse
 procedure - decoding:
 
 ```
 original_guid = new_guid + model_uuid
 ```
 
-Basically this allows us to continue studying our favorite deck
-when we migrate it from `*.apkg` to Anki DM. But if you create
-a new deck variant **with new model UUID** then all GUIDs be
-also new and won't lead to a conflict inside Anki.
+This made it possible to continue studying our favorite deck
+when we migrated it from `*.apkg` to Anki DM. And while
+this perfectly worked in Anki for Desktop it turned to be
+broken in AnkiDroid which is very bad at updating decks.
+
+For this reason we basically cannot continue using original UUIDs anymore and
+they are deliberately overwritten with new values. What this means is that
+if you imported some deck and then built it using Anki DM, it will be treated 
+as a new deck by Anki Desktop/Droid.
+
+What is guaranteed however is the persistence of notes across builds.
 
 ## Installation
 
