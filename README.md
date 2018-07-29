@@ -88,12 +88,15 @@ of the deck and the model, and assign UUIDs for the deck, model and config.
 
 ```json
 {
-  "name": "My Deck",
-  "model_name": "My Deck Model",
-  "uuids": {
-    "deck": "a49aa3a0-8f80-11e8-a999-c86000cb6fe2",
-    "model": "a49aa3a4-8f80-11e8-a999-c86000cb6fe2",
-    "config": "a49aa3a1-8f80-11e8-a999-c86000cb6fe2"
+  "deck": {
+    "uuid": "a49aa3a4-8f80-11e8-a999-c86000cb6fe2"
+  },
+  "config": {
+    "uuid": "a49aa3a4-8f80-11e8-a999-c86000cb6fe2",
+    "name": "Default"
+  },
+  "model": {
+    "uuid": "a49aa3a4-8f80-11e8-a999-c86000cb6fe2"
   },
   "fields": [
     "Front",
