@@ -32,7 +32,7 @@ class Importer {
 
     // Array of IDs
     // We don't preserve $deck_data['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['deck']['uuid'] = Uuid::uuid1();
+    $build_info['deck']['uuid'] = (string) Uuid::uuid1();
 
     // GLOBAL
 
@@ -43,7 +43,7 @@ class Importer {
     // Save configuration
     $configuration = $deck_data['deck_configurations'][0];
     // We don't preserve $configuration['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['config']['uuid'] = Uuid::uuid1();
+    $build_info['config']['uuid'] = (string) Uuid::uuid1();
     $build_info['config']['name'] = $configuration['name'];
     $configuration_info = array_intersect_key($configuration, array_flip(['autoplay', 'dyn', 'lapse', 'maxTaken', 'new', 'replayq', 'rev', 'timer']));
     file_put_contents("$dir/config.json", Util::toJson($configuration_info));
@@ -55,7 +55,7 @@ class Importer {
     // Save model
     $model = $deck_data['note_models'][0];
     // We don't preserve $model['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['model']['uuid'] = Uuid::uuid1();
+    $build_info['model']['uuid'] = (string) Uuid::uuid1();
     $build_info['model']['name'] = $model['name'];
     $model_info = array_intersect_key($model, array_flip(['latexPost', 'latexPre', 'type'])) + ['vers' => []];
     file_put_contents("$dir/model.json", Util::toJson($model_info));
