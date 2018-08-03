@@ -60,15 +60,6 @@ class Importer {
     $model_info = array_intersect_key($model, array_flip(['latexPost', 'latexPre', 'type'])) + ['vers' => []];
     file_put_contents("$dir/model.json", Util::toJson($model_info));
 
-    // Save fields
-    Util::prepareDir("$dir/fields");
-    foreach($model['flds'] as $field) {
-      $field_name = Util::checkFieldName($field['name']);
-      // Unset ordinal numbers
-      unset($field['ord']);
-      unset($field['name']);
-      file_put_contents("$dir/fields/$field_name.json", Util::toJson($field));
-    }
     $field_list = array_map(function ($value) {
       return $value['name'];
     }, $model['flds']);

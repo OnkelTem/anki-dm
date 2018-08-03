@@ -122,6 +122,16 @@ class Util {
     return $data;
   }
 
+  public static function getFieldDefaults() {
+    return [
+      "font" => 'Arial',
+      "media" => [],
+      "rtl" => FALSE,
+      "size" => 20,
+      "sticky" => FALSE
+    ];
+  }
+
   public static function getJson($file, $required = TRUE) {
     $data = static::getRaw($file, $required);
     if (!isset($data)) {

@@ -9,7 +9,6 @@ class Builder {
       'deck' => Util::getJson($src_dir . '/deck.json'),
       'config' => Util::getJson($src_dir . '/config.json'),
       'model' => Util::getJson($src_dir . '/model.json'),
-      'fields' => Util::getFields($src_dir . '/fields'),
       'media' => Util::getFilesList($src_dir . '/media'),
       'templates' => Util::getTemplates($src_dir . '/templates'),
       'desc' => Util::getRaw($src_dir . '/desc.html'),
@@ -68,14 +67,20 @@ class Builder {
           $deck_templates_info[] = ['name'  => $template, 'ord' => $k++] + $globals['templates'][$template];
         }
 
+        // Get field list from the data
+        $field_list = [];
+        foreach(array_keys($globals['data'][$lang]) as $field_name) {
+          $field_list[$field_name] = 1;
+        }
+
         // Populate fields
         $deck_fields_info = [];
         $i = 0;
         foreach ($deck_build['fields'] as $field) {
-          if (!isset($globals['fields'][$field])) {
+          if (!isset($field_list[$field])) {
             Util::err("Field '$field' not found.");
           }
-          $deck_fields_info[] = ['name'  => $field, 'ord' => $i++] + $globals['fields'][$field];
+          $deck_fields_info[] = ['name'  => $field, 'ord' => $i++] + Util::getFieldDefaults();
         }
 
         // Populate model
