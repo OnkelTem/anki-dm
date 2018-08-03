@@ -45,7 +45,7 @@ class Builder {
         $deck_data = [
           '__type__' => 'Deck',
           'crowdanki_uuid' => $deck_build['deck']['uuid'],
-          'name' => Util::ensureDeckName($lang == 'default' ? $deck : $deck . '[' . $lang . ']'),
+          'name' => Util::filenameToDeck($lang == 'default' ? $deck : $deck . '[' . $lang . ']'),
           'desc' => isset($deck_build['@desc']) ? $deck_build['@desc'] : $globals['desc'],
         ] + array_merge($globals['deck'], $deck_build['@deck']);
 

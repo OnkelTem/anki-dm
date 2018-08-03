@@ -37,21 +37,21 @@ class Indexer {
       }
       if (empty($guid)) {
         // Empty
-        $guid = Util::ankiPyGuid64();
+        $guid = Util::createGuid();
       }
       else if (in_array($guid, $guids)) {
         // Duplicate
-        $guid = Util::ankiPyGuid64();
+        $guid = Util::createGuid();
       }
       else if ($full) {
         // Reindex
-        $guid = Util::ankiPyGuid64();
+        $guid = Util::createGuid();
       }
       $guids[] = $guid;
       fputcsv($fp, $row);
     }
     fclose($fp);
-    Util::msg('Successfuly reindexed "data.csv"');
+    Util::msg('Successfully reindexed "data.csv"');
   }
 
 }

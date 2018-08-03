@@ -2,16 +2,14 @@
 
 namespace AnkiDeckManager;
 
-use Ramsey\Uuid\Uuid;
-
 class Copier {
 
   public static function copy($deck1, $deck2, $base) {
-    $deck1_path = $base . '/decks/' . Util::ensureDeckFilename($deck1);
+    $deck1_path = $base . '/decks/' . Util::deckToFilename($deck1);
 
     $deck2_suffix = "";
     if ($deck2) {
-      $deck2_path = $base . '/decks/' . Util::ensureDeckFilename($deck2);
+      $deck2_path = $base . '/decks/' . Util::deckToFilename($deck2);
     }
     else {
       // Calculate destination deck name
@@ -34,9 +32,9 @@ class Copier {
     $deck_build = Util::getJson($deck2_path . '/build.json');
 
     // Create new uuids
-    $deck_build['deck']['uuid'] = (string) Uuid::uuid1();
-    $deck_build['config']['uuid'] = (string) Uuid::uuid1();
-    $deck_build['model']['uuid'] = (string) Uuid::uuid1();
+    $deck_build['deck']['uuid'] = Util::createUuid();
+    $deck_build['config']['uuid'] = Util::createUuid();
+    $deck_build['model']['uuid'] = Util::createUuid();
 
     file_put_contents($deck2_path . '/build.json', Util::toJson($deck_build));
 
