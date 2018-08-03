@@ -61,10 +61,11 @@ class Builder {
         $deck_templates_info = [];
         $k = 0;
         foreach ($deck_build['templates'] as $template) {
-          if (!isset($globals['templates'][$template])) {
+          $template_filename = Util::ensureFilename($template);
+          if (!isset($globals['templates'][$template_filename])) {
             Util::err("Field template '$template' not found.");
           }
-          $deck_templates_info[] = ['name'  => $template, 'ord' => $k++] + $globals['templates'][$template];
+          $deck_templates_info[] = ['name'  => $template, 'ord' => $k++] + $globals['templates'][$template_filename];
         }
 
         // Get field list from the data
