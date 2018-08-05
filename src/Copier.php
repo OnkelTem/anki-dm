@@ -7,6 +7,11 @@ class Copier {
   public static function copy($deck1, $deck2, $base) {
     $deck1_path = $base . '/decks/' . Util::deckToFilename($deck1);
 
+    // Check if source deck exists
+    if (!is_dir($deck1_path)) {
+      Util::err("Source deck not found: " . $deck1);
+    }
+
     $deck2_suffix = "";
     if ($deck2) {
       $deck2_path = $base . '/decks/' . Util::deckToFilename($deck2);
@@ -18,11 +23,6 @@ class Copier {
         $i++;
       }
       $deck2_suffix = " ($i)";
-    }
-
-    // Check if source deck exists
-    if (!is_dir($deck1_path)) {
-      Util::err("Source deck not found: " . $deck1);
     }
 
     if (!Util::xcopy($deck1_path, $deck2_path)) {

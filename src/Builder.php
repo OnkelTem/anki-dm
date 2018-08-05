@@ -187,11 +187,12 @@ class Builder {
     else {
       // Build only specified decks
       foreach($decks as $deck) {
-        if (file_exists($dir . '/' . $deck) && filetype($dir . '/' . $deck) == 'dir') {
-          $decks_data[$deck] = static::readDeck($dir . '/' . $deck);
+        $deck_filename = Util::deckToFilename($deck);
+        if (file_exists($dir . '/' . $deck_filename) && filetype($dir . '/' . $deck_filename) == 'dir') {
+          $decks_data[$deck_filename] = static::readDeck($dir . '/' . $deck_filename);
         }
         else {
-          Util::err('Deck not found: ' . $dir . '/' . $deck);
+          Util::err('Deck not found: ' . $dir . '/' . $deck_filename);
         }
       }
     }
