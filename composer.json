@@ -8,7 +8,8 @@
   "version": "0.1",
   "require": {
     "docopt/docopt": "*",
-    "ramsey/uuid": "*"
+    "ramsey/uuid": "*",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {

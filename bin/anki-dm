@@ -9,6 +9,7 @@ use AnkiDeckManager\Importer;
 
 if(file_exists($file = dirname(__DIR__) . "/vendor/autoload.php")) {
   // Script is in ~/dir (f.e. ~/bin)
+  /** @noinspection PhpIncludeInspection */
   require $file;
 }
 else {

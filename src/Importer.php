@@ -2,8 +2,6 @@
 
 namespace AnkiDeckManager;
 
-use Ramsey\Uuid\Uuid;
-
 class Importer {
 
   static function import($path, $dir, $deck = NULL) {
@@ -22,17 +20,17 @@ class Importer {
 
     // Check if we support such deck
     if (count($deck_data['deck_configurations']) > 1 || count($deck_data['note_models']) > 1) {
-      err("Multiple models or configurations per deck is not supported");
+      Util::err("Multiple models or configurations per deck is not supported");
     }
 
     // Check if it's an empty deck
     if (count($deck_data['deck_configurations']) == 0 || count($deck_data['note_models']) == 0) {
-      err("Decks with empty models or configurations are not supported. Try adding one card in your deck.");
+      Util::err("Decks with empty models or configurations are not supported. Try adding one card in your deck.");
     }
 
     // Array of IDs
     // We don't preserve $deck_data['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['deck']['uuid'] = (string) Uuid::uuid1();
+    $build_info['deck']['uuid'] = Util::createUuid();
 
     // GLOBAL
 
@@ -43,7 +41,7 @@ class Importer {
     // Save configuration
     $configuration = $deck_data['deck_configurations'][0];
     // We don't preserve $configuration['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['config']['uuid'] = (string) Uuid::uuid1();
+    $build_info['config']['uuid'] = Util::createUuid();
     $build_info['config']['name'] = $configuration['name'];
     $configuration_info = array_intersect_key($configuration, array_flip(['autoplay', 'dyn', 'lapse', 'maxTaken', 'new', 'replayq', 'rev', 'timer']));
     file_put_contents("$dir/config.json", Util::toJson($configuration_info));
@@ -55,20 +53,11 @@ class Importer {
     // Save model
     $model = $deck_data['note_models'][0];
     // We don't preserve $model['crowdanki_uuid'] as AnkiDroid cannot deal with it
-    $build_info['model']['uuid'] = (string) Uuid::uuid1();
+    $build_info['model']['uuid'] = Util::createUuid();
     $build_info['model']['name'] = $model['name'];
     $model_info = array_intersect_key($model, array_flip(['latexPost', 'latexPre', 'type'])) + ['vers' => []];
     file_put_contents("$dir/model.json", Util::toJson($model_info));
 
-    // Save fields
-    Util::prepareDir("$dir/fields");
-    foreach($model['flds'] as $field) {
-      $field_name = Util::checkFieldName($field['name']);
-      // Unset ordinal numbers
-      unset($field['ord']);
-      unset($field['name']);
-      file_put_contents("$dir/fields/$field_name.json", Util::toJson($field));
-    }
     $field_list = array_map(function ($value) {
       return $value['name'];
     }, $model['flds']);
@@ -108,7 +97,8 @@ class Importer {
     $templates = $model['tmpls'];
     Util::prepareDir("$dir/templates");
     foreach($templates as $template) {
-      file_put_contents("$dir/templates/$template[name].html", $template['qfmt'] . "\n\n--\n\n" . $template['afmt']);
+      $template_filename = Util::ensureFilename($template['name']);
+      file_put_contents("$dir/templates/$template_filename.html", $template['qfmt'] . "\n\n--\n\n" . $template['afmt']);
     }
     // Keep templates list for later
     $template_list = array_map(function ($value) {
@@ -129,7 +119,7 @@ class Importer {
       $deck = $deck_name;
     }
 
-    $deck_dir_name = Util::ensureDeckFilename($deck_name);
+    $deck_dir_name = Util::deckToFilename($deck_name);
     Util::prepareDir("$dir/decks/$deck_dir_name");
 
     $build_info += [

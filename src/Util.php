@@ -2,6 +2,8 @@
 
 namespace AnkiDeckManager;
 
+use Ramsey\Uuid\Uuid;
+
 class Util {
 
   public static function prepareDir($dir) {
@@ -11,7 +13,7 @@ class Util {
     }
 
     if (!is_dir($dir)) {
-      err('Cannot create directory: ' . $dir);
+      Util::err('Cannot create directory: ' . $dir);
     }
   }
 
@@ -29,6 +31,7 @@ class Util {
   }
 
   public static function toJson($data) {
+    /** @noinspection PhpComposerExtensionStubsInspection */
     $result = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     $result = preg_replace('/^(  +?)\\1(?=[^ ])/m', '$1', $result);
     return $result;
@@ -122,11 +125,22 @@ class Util {
     return $data;
   }
 
+  public static function getFieldDefaults() {
+    return [
+      "font" => 'Arial',
+      "media" => [],
+      "rtl" => FALSE,
+      "size" => 20,
+      "sticky" => FALSE
+    ];
+  }
+
   public static function getJson($file, $required = TRUE) {
     $data = static::getRaw($file, $required);
     if (!isset($data)) {
       return [];
     }
+    /** @noinspection PhpComposerExtensionStubsInspection */
     return json_decode($data, TRUE);
   }
 
@@ -205,6 +219,17 @@ class Util {
     return $buf;
   }
 
+  public static function createUuid() {
+    $result = '';
+    try {
+      $result = (string) Uuid::uuid1();
+    }
+    catch (\Exception $e) {
+      static::err($e->getMessage());
+    }
+    return $result;
+  }
+
   public static function uuidEncode($uuid, $lang) {
     if ($lang == 'default') {
       return $uuid;
@@ -276,19 +301,34 @@ class Util {
     return $result;
   }
 
-
   public static function isDirEmpty($dir) {
     if (!is_readable($dir)) return NULL;
     return (count(scandir($dir)) == 2);
   }
 
-  public static function ensureDeckFilename($filename) {
-    return str_replace('::', '__', $filename);
+  public static function deckToFilename($deck) {
+    $filename = str_replace('_', '___', $deck);
+    $filename = str_replace('::', '__', $filename);
+    return static::ensureFilename($filename);
   }
 
-  public static function ensureDeckName($filename) {
-    return str_replace('__', '::', $filename);
+  public static function filenameToDeck($filename) {
+    $deck = preg_replace_callback('~(_+)~', function($match) {
+      return strlen($match[1]) == 2 ? '::' : $match[1];
+    }, $filename);
+    $deck = str_replace('___', '_', $deck);
+    return $deck;
   }
+
+  public static function ensureFilename($filename) {
+    $allowed_chars = str_split('abcdefghijklmnopqrstuvwxyz' . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' . '0123456789' . "$-_ ");
+    $result = '';
+    foreach(str_split($filename) as $char) {
+      $result .= in_array($char, $allowed_chars) ? $char : '-';
+    }
+    return $result;
+  }
+
 
   public static function checkFieldName($name) {
     if (in_array($name, ['guid', 'tags'])) {
