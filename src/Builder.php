@@ -132,7 +132,7 @@ class Builder {
           $deck_fields_data[$i]['guid'] = Util::guidDecode($cell, $deck_build['model']['uuid']);
         }
 
-        if (!isset($globals['data'][$lang]['tags'])) {
+        if (isset($globals['data'][$lang]['tags'])) {
           foreach ($globals['data'][$lang]['tags'] as $i => $cell) {
             $deck_fields_data[$i]['tags'] = explode(' ', $cell);
           }
