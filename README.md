@@ -1,6 +1,6 @@
 # Anki Deck Manager
 
-**Anki Deck Manager** (`anki-dsm`) is a tool for creating and maintaining
+**Anki Deck Manager** (`anki-dm`) is a tool for creating and maintaining
 multilingual multi-variant Anki decks. It reads files organized in
 a specific way and generates CrowdAnki JSON decks. I.e. it doesn't create
 some installable `*.apkg` files for Anki, you should use [CrowdAnki add-on](https://github.com/Stvad/CrowdAnki)
