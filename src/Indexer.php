@@ -19,7 +19,7 @@ class Indexer {
       if (!$header_found) {
         $header_found = TRUE;
         if (($guid_column = array_search('guid', $row)) === FALSE) {
-          Util::err('Missing "guild" column');
+          Util::err('Missing "guid" column');
         }
       }
       $data[] = $row;
