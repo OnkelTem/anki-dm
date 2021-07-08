@@ -379,4 +379,16 @@ class Util {
     $dir->close();
     return true;
   }
+  public static function customFputcsv($file, $row) {
+    $temp_file = fopen("php://memory", "r+");
+    $temp_array = array ();
+    foreach ($row as $field) {
+      $temp_array[] = str_replace(" ", "\0", $field);
+    }
+    fputcsv($temp_file, $temp_array);
+    rewind($temp_file);
+    $string = str_replace("\0", " ", stream_get_contents($temp_file));
+    fwrite($file, $string);
+    fclose($temp_file);
+  }
 }

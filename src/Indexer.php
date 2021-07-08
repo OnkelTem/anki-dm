@@ -32,7 +32,7 @@ class Indexer {
     foreach ($data as $i => &$row) {
       $guid = &$row[$guid_column];
       if ($i === 0) {
-        fputcsv($fp, $row);
+        Util::customFputcsv($fp, $row);
         continue;
       }
       if (empty($guid)) {
@@ -48,7 +48,7 @@ class Indexer {
         $guid = Util::createGuid();
       }
       $guids[] = $guid;
-      fputcsv($fp, $row);
+      Util::customFputcsv($fp, $row);
     }
     fclose($fp);
     Util::msg('Successfully reindexed "data.csv"');
